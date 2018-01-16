@@ -7,32 +7,25 @@ class Interpreter(object):
     def __init__(self, program):
         self._program = program
 
-    def find_operation(self, operation, expected=1, optional=False):
+    def get_instructions(self, operation, one_result=False, optional=False):
         if type(operation) == type(''):
             test = lambda i: i.get('op') == operation
         elif type(operation) == type([]):
             test = lambda i: i.get('op') in operation
-        if not optional:
-            if expected == 1:
-                ops = [item for item in self._program if test(item)]
-                if len(ops) == expected:
-                    return ops[0]
-                else:
-                    raise RuntimeException('Operation {} appears too many times'.format(operation))
+        matching = [op for op in self._program if test(op)]
+        if optional and len(matching) == 0:
+            return None
+        if one_result:
+            if not len(matching) == 1:
+                raise RuntimeException('Too many instances of instruction: {}'.format(matching))
             else:
-                ops = [item for item in self._program if test(item)]
-                if len(ops) == expected or expected == -1:
-                    return ops
-                else:
-                    string = 'Operation {} appears the wrong number of times expected:{}, found:{}'.format(operation,
-                                                                                                        expected,
-                                                                                                        len(ops))
-                    raise RuntimeException(string)
+                return matching[0]
         else:
-            return [item for item in self._program if test(item)]
+            return matching
+
 
     def get_column_transforms(self):
-        transforms = self.find_operation(['col', '|'], expected=-1)
+        transforms = self.get_instructions(['col', '|'])
         indices = [transforms.index(item) for item in transforms if item.get('op') == 'col']
         indices.append(None)
         if len(indices) == 2:
@@ -48,39 +41,32 @@ class Interpreter(object):
             columns.setdefault(col_name, Column(instructions))
         return columns
 
-    def get_args_for_op(self, operation, expected=1, optional=False):
-        operation = self.find_operation(operation, optional=optional)
-        if type(operation) == type([]):
-            args = [op.get('args') for op in operation]
-            if not args:
-                return args
-            if len(args) == expected:
-                if expected == 1:
-                    return args[0]
-                else:
-                    return args
-        elif type(operation) == type({}):
-            args = operation.get('args')
-            if len(args) == expected:
-                if expected == 1:
-                    return args[0]
+    def get_args_for_op(self, operation, expected=1, one_result=False, optional=False):
+        instructions = self.get_instructions(operation)
+        ins_args = [item.get('args') for item in instructions]
+        if optional and len(ins_args) == 0:
+            return None
+        if one_result:
+            if not len(ins_args) == 1:
+                raise RuntimeException('Too many instances of instruction: {}'.format(matching))
             else:
-                return args
+                if expected == 1:
+                    return ins_args[0][0]
+                elif expected == -1:
+                    return ins_args[0]
+        else:
+            return ins_args
 
     def __call__(self):
         # build up how to read file
-        inpath = self.get_args_for_op('read')
-        outpath = self.get_args_for_op('write')
-        encoding = self.get_args_for_op('encoding', optional=True)
-        quotechar = self.get_args_for_op('quotechar', optional=True)
-        separator = self.get_args_for_op('separator', optional=True)
+        inpath = self.get_args_for_op('read', one_result=True)
+        outpath = self.get_args_for_op('write', one_result=True)
+        encoding = self.get_args_for_op('encoding', one_result=True, optional=True)
+        quotechar = self.get_args_for_op('quotechar', one_result=True, optional=True)
+        separator = self.get_args_for_op('separator', one_result=True, optional=True)
 
-        if len(encoding) == 1:
-            infile = open(inpath, 'r', encoding=encoding[0])
-            outfile = open(outpath, 'w', encoding=encoding[0])
-        else:
-            infile = open(inpath, 'r')
-            outfile = open(outpath, 'w')
+        infile = open(inpath, 'r', encoding=encoding)
+        outfile = open(outpath, 'w', encoding=encoding)
 
         # create reader for csv
         reader_opts = {
@@ -91,8 +77,15 @@ class Interpreter(object):
 
         # create writer for csv
         headers = reader.fieldnames
-        column_order = self.get_args_for_op('column_order', expected=-1)
+        # column_order = self.get_args_for_op('column_order', one_result=True)
+        column_order = self.get_args_for_op('column_order', expected=-1, one_result=True)
         headers = sorted(headers, key=lambda col: column_order.index(col))
+
+        renames = self.get_args_for_op('column_rename', optional=True)
+        rename_lookup = {}
+        for old, new in renames:
+            rename_lookup[old] = new
+            headers[headers.index(old)] = new
 
         writer = csv.DictWriter(outfile, fieldnames=headers, **reader_opts)
         # write header
@@ -104,6 +97,9 @@ class Interpreter(object):
         # for each row
         for row in reader:
             new_row = {}
+            for key, val in rename_lookup.items():
+                row[val] = row[key]
+                del row[key]
             for key in headers:
                 # pass row through transforms
                 try:
@@ -112,9 +108,6 @@ class Interpreter(object):
                     raise RuntimeException('No column transform found for {}'.format(key))
                 # write row to file
             try:
-                print()
-                print(row)
-                print(new_row)
                 writer.writerow(new_row)
             except:
                 print('Failed to write: {}'.format(new_row))
