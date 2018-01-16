@@ -85,8 +85,6 @@ class AuditorCompiler(object):
     def validate(self, parsed):
         op_args = [(item.get('op'), item.get('args'), item.get('line_num'))
                    for item in parsed]
-        for item in op_args:
-            print(item)
         for operation, args, line_num in op_args:
             try:
                 if operation == 'read':

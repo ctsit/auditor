@@ -40,9 +40,6 @@ class Interpreter(object):
         else:
             transform_by_col = [transforms[indices[i]:indices[i+1]] for i in range(len(indices) - 1)]
 
-        import pdb
-        pdb.set_trace()
-
         columns = {}
         for instructions in transform_by_col:
             col_op = instructions[0]
@@ -95,7 +92,7 @@ class Interpreter(object):
         # create writer for csv
         headers = reader.fieldnames
         column_order = self.get_args_for_op('column_order', expected=-1)
-        headers.sort(key=lambda col: column_order.index(col))
+        headers = sorted(headers, key=lambda col: column_order.index(col))
 
         writer = csv.DictWriter(outfile, fieldnames=headers, **reader_opts)
         # write header
@@ -107,7 +104,7 @@ class Interpreter(object):
         # for each row
         for row in reader:
             new_row = {}
-            for key, value in row.items():
+            for key in headers:
                 # pass row through transforms
                 try:
                     new_row.setdefault(key, columns[key](row))
@@ -115,6 +112,9 @@ class Interpreter(object):
                     raise RuntimeException('No column transform found for {}'.format(key))
                 # write row to file
             try:
+                print()
+                print(row)
+                print(new_row)
                 writer.writerow(new_row)
             except:
                 print('Failed to write: {}'.format(new_row))
