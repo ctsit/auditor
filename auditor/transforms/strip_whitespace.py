@@ -4,10 +4,10 @@ def transform_body(value, name, row):
     # write the transform here
     return value
 
-class Strip_WhitespaceCompileException(CompileException):
+class StripWhitespaceCompileException(CompileException):
     pass
 
-class Strip_WhitespaceRuntimeException(RuntimeException):
+class StripWhitespaceRuntimeException(RuntimeException):
     pass
 
 def compile_time_error(*args, **kwargs):
@@ -21,7 +21,7 @@ def check_args(*args):
     """
     The date_parse transform takes no compile time args
     """
-    raise Strip_WhitespaceCompileException
+    raise StripWhitespaceCompileException
 
 
 def get_transform_function(*compile_args):
@@ -30,6 +30,6 @@ def get_transform_function(*compile_args):
         try:
             return transform_body(*runtime_args)
         except Exception as ex:
-            raise Strip_WhitespaceRuntimeException(ex)
+            raise StripWhitespaceRuntimeException(ex)
 
     return transform

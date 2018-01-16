@@ -19,7 +19,7 @@ with open(os.path.join(get_root(), 'transforms/init_template.txt')) as tempfile:
 
 for item in sys.argv[1:]:
     context = {
-        'camel_case_name': ''.join(x for x in item.title() if not x.isspace()),
+        'camel_case_name': ''.join(x for x in item.title() if not ( x.isspace() or x == '_' )),
         'snake_case_name': item
     }
     with open(os.path.join(get_root(), 'transforms/{}.py'.format(item)), 'w') as outfile:
