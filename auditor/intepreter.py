@@ -34,10 +34,14 @@ class Interpreter(object):
     def get_column_transforms(self):
         transforms = self.find_operation(['col', '|'], expected=-1)
         indices = [transforms.index(item) for item in transforms if item.get('op') == 'col']
-        if len(indices) == 1:
+        indices.append(None)
+        if len(indices) == 2:
             transform_by_col = [transforms]
         else:
             transform_by_col = [transforms[indices[i]:indices[i+1]] for i in range(len(indices) - 1)]
+
+        import pdb
+        pdb.set_trace()
 
         columns = {}
         for instructions in transform_by_col:

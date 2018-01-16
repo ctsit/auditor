@@ -34,7 +34,18 @@ class AuditorCompiler(object):
         operations = []
         current_operation = None
         for index, line in enumerate(lines):
-            tokens = line.split()
+
+            if '"' in line and not 'quotechar' in line:
+                items = line.split('"')
+                tokens = []
+                for ind, item in enumerate(items):
+                    if ind % 2 == 0:
+                        tokens += item.split()
+                    else:
+                        tokens += [item]
+            else:
+                tokens = line.split()
+
             for token in tokens:
                 if token in AuditorCompiler.operator_tokens:
                     current_operation = token
@@ -74,6 +85,8 @@ class AuditorCompiler(object):
     def validate(self, parsed):
         op_args = [(item.get('op'), item.get('args'), item.get('line_num'))
                    for item in parsed]
+        for item in op_args:
+            print(item)
         for operation, args, line_num in op_args:
             try:
                 if operation == 'read':
