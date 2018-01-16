@@ -1,7 +1,7 @@
 read test.csv
 write test2.csv
 
-column_order "two birds" one
+column_order two "one bird"
 column_rename "two birds" two
 column_rename one "one bird"
 

@@ -1,6 +1,7 @@
 from auditor.base_exceptions import RuntimeException
 from auditor.column import Column
 import csv
+from copy import copy
 
 class Interpreter(object):
 
@@ -76,16 +77,15 @@ class Interpreter(object):
         reader = csv.DictReader(infile, **reader_opts)
 
         # create writer for csv
-        headers = reader.fieldnames
-        # column_order = self.get_args_for_op('column_order', one_result=True)
-        column_order = self.get_args_for_op('column_order', expected=-1, one_result=True)
-        headers = sorted(headers, key=lambda col: column_order.index(col))
-
+        headers = copy(reader.fieldnames)
         renames = self.get_args_for_op('column_rename', optional=True)
         rename_lookup = {}
         for old, new in renames:
             rename_lookup[old] = new
             headers[headers.index(old)] = new
+        column_order = self.get_args_for_op('column_order', expected=-1, one_result=True)
+        headers = sorted(headers, key=lambda col: column_order.index(col))
+
 
         writer = csv.DictWriter(outfile, fieldnames=headers, **reader_opts)
         # write header
