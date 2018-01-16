@@ -1,14 +1,13 @@
 from auditor.base_exceptions import CompileException, RuntimeException
-import dateutil.parser as date_parser
 
 def transform_body(value, name, row):
     # write the transform here
-    return date_parser.parse(value).strftime('%Y-%m-%d')
+    return value
 
-class DateParseCompileException(CompileException):
+class {{camel_case_name}}CompileException(CompileException):
     pass
 
-class DateParseRuntimeException(RuntimeException):
+class {{camel_case_name}}RuntimeException(RuntimeException):
     pass
 
 def compile_time_error(*args, **kwargs):
@@ -16,14 +15,13 @@ def compile_time_error(*args, **kwargs):
     This should return a message that says what things you need
     in order to run your function
     """
-    return "date_parse compile error".format(*args, **kwargs)
+    return "{{snake_case_name}} compile error".format(*args, **kwargs)
 
 def check_args(*args):
     """
     The date_parse transform takes no compile time args
     """
-    if len(args):
-        raise DateParseCompileException
+    raise {{camel_case_name}}CompileException
 
 
 def get_transform_function(*compile_args):
@@ -32,6 +30,6 @@ def get_transform_function(*compile_args):
         try:
             return transform_body(*runtime_args)
         except Exception as ex:
-            raise DateParseRuntimeException(ex)
+            raise {{camel_case_name}}RuntimeException(ex)
 
     return transform

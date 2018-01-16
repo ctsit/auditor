@@ -1,0 +1,3 @@
+{% for path in transforms %}
+from .{{path}} import *
+{% endfor %}
