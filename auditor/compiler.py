@@ -10,6 +10,7 @@ class AuditorCompiler(object):
         'separator',
         'quotechar',
         'write',
+        'column_add',
         'column_order',
         'column_rename',
         # 'row_sort',
@@ -91,6 +92,9 @@ class AuditorCompiler(object):
                     self.__check_file(*args)
                 elif operation in ['encoding', 'separator', 'quotechar', 'write']:
                     check = self.__get_has_num_args(num=1)
+                    check(*args)
+                elif operation == 'column_add':
+                    check = self.__get_has_num_args(greater_equal=1)
                     check(*args)
                 elif operation == 'column_rename':
                     check = self.__get_has_num_args(num=2)

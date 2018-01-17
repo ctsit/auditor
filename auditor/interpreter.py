@@ -49,7 +49,7 @@ class Interpreter(object):
             return None
         if one_result:
             if not len(ins_args) == 1:
-                raise RuntimeException('Too many instances of instruction: {}'.format(matching))
+                raise RuntimeException('Too many instances of instruction: {}'.format(instructions))
             else:
                 if expected == 1:
                     return ins_args[0][0]
@@ -78,6 +78,9 @@ class Interpreter(object):
 
         # create writer for csv
         headers = copy(reader.fieldnames)
+        new_cols = self.get_args_for_op('column_add', one_result=True, expected=-1, optional=True)
+        if new_cols:
+            headers += new_cols
         renames = self.get_args_for_op('column_rename', optional=True)
         rename_lookup = {}
         for old, new in renames:
