@@ -1,7 +1,10 @@
 from auditor.base_exceptions import CompileException, RuntimeException
+import os
+import yaml
 
-def transform_body(value, name, row):
-    # write the transform here
+def transform_body(value, name, row, key, lookup_data):
+    lookup_key = row[key]
+    value = lookup_data.get(lookup_key)
     return value
 
 class LookupCompileException(CompileException):
@@ -15,20 +18,41 @@ def compile_time_error(*args, **kwargs):
     This should return a message that says what things you need
     in order to run your function
     """
-    return "lookup compile error".format(*args, **kwargs)
+    return """
+    lookup requires two additional args:
+      *  a path to a yaml or json file that is a dictionary
+      *  the the name of the column from which to get the data to do a lookup
+    passed args: {}
+    """.format(*args, **kwargs)
 
 def check_args(*args):
     """
     The date_parse transform takes no compile time args
     """
-    raise LookupCompileException
+    try:
+        func = args[0]
+        lookup_file_path = args[1]
+        key = args[2]
+    except:
+        raise LookupCompileException(compile_time_error(*args))
+    if not os.path.isfile(lookup_file_path):
+        LookupCompileException("""
+        Please pass a valid path to a json or yaml dictionary
+        path passed: {}
+        current working directory: {}
+        """.format(lookup_file_path, os.getcwd()))
 
 
 def get_transform_function(*compile_args):
+    func, lookup_file_path, key = compile_args
+    with open(lookup_file_path, 'r') as infile:
+        lookup_data = yaml.load(infile)
 
     def transform(*runtime_args):
+        nonlocal lookup_data
+        nonlocal key
         try:
-            return transform_body(*runtime_args)
+            return transform_body(*runtime_args, key=key, lookup_data=lookup_data)
         except Exception as ex:
             raise LookupRuntimeException(ex)
 

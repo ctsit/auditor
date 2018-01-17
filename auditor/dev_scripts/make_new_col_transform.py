@@ -28,9 +28,10 @@ for item in sys.argv[1:]:
 transforms = []
 for root, dirs, files in os.walk(os.path.join(get_root(), 'transforms')):
     for path in files:
-        if path != '__init__.py' and path != 'transform_template.txt' and path != 'init_template.txt':
+        if not 'init' in path and path != 'transform_template.txt' and not '__pycache__' in root:
             transforms.append(path.split('.')[0])
 
+transforms = list(set(transforms))
 
 with open(os.path.join(get_root(), 'transforms/__init__.py'), 'w') as outfile:
     outfile.write(init_template.render(transforms=transforms))

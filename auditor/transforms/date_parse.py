@@ -16,14 +16,17 @@ def compile_time_error(*args, **kwargs):
     This should return a message that says what things you need
     in order to run your function
     """
-    return "date_parse compile error".format(*args, **kwargs)
+    return """
+    There should be no args passed to date_parse calls
+    Args passed: {}
+    """.format(*args, **kwargs)
 
 def check_args(*args):
     """
     The date_parse transform takes no compile time args
     """
-    if len(args):
-        raise DateParseCompileException
+    if not ( len(args) == 1 and args[0] == 'date_parse' ):
+        raise DateParseCompileException(compile_time_error(*args))
 
 
 def get_transform_function(*compile_args):

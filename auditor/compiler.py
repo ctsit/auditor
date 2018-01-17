@@ -13,7 +13,6 @@ class AuditorCompiler(object):
         'column_add',
         'column_order',
         'column_rename',
-        # 'row_sort',
         'col',
         '|',
     ]
@@ -99,12 +98,11 @@ class AuditorCompiler(object):
                 elif operation == 'column_rename':
                     check = self.__get_has_num_args(num=2)
                     check(*args)
-                # elif operation in ['column_order', 'row_sort', '|']:
-                elif operation in ['column_order', '|']:
+                elif operation in ['column_order']:
                     check = self.__get_has_num_args(greater_equal=1)
                     check(*args)
                 elif operation == '|':
-                    check = self.__get_has_num_args(num=1)
+                    check = self.__get_has_num_args(greater_equal=1)
                     check(*args)
                     try:
                         transform = importlib.import_module('auditor.transforms.{}'.format(args[0]))

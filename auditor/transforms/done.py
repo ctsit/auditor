@@ -1,13 +1,12 @@
 from auditor.base_exceptions import CompileException, RuntimeException
 
 def transform_body(value, name, row):
-    # write the transform here
     return value
 
-class GreaterThanCompileException(CompileException):
+class DoneCompileException(CompileException):
     pass
 
-class GreaterThanRuntimeException(RuntimeException):
+class DoneRuntimeException(RuntimeException):
     pass
 
 def compile_time_error(*args, **kwargs):
@@ -16,15 +15,17 @@ def compile_time_error(*args, **kwargs):
     in order to run your function
     """
     return """
-    greater_than compile error
-    Did you modify the check args function?
+    done compile error
+    done command accepts no args
     """.format(*args, **kwargs)
 
 def check_args(*args):
     """
-    The date_parse transform takes no compile time args
+    The done transform takes no compile time args
+    and is what a column command should be finished with
     """
-    raise GreaterThanCompileException(compile_time_error(*args))
+    if not (len(args) == 1 and args[0] == 'done'):
+        raise DoneCompileException(compile_time_error(*args))
 
 
 def get_transform_function(*compile_args):
@@ -33,6 +34,6 @@ def get_transform_function(*compile_args):
         try:
             return transform_body(*runtime_args)
         except Exception as ex:
-            raise GreaterThanRuntimeException(ex)
+            raise DoneRuntimeException(ex)
 
     return transform

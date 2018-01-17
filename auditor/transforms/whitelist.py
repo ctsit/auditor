@@ -15,13 +15,16 @@ def compile_time_error(*args, **kwargs):
     This should return a message that says what things you need
     in order to run your function
     """
-    return "whitelist compile error".format(*args, **kwargs)
+    return """
+    whitelist compile error
+    Did you modify the check args function?
+    """.format(*args, **kwargs)
 
 def check_args(*args):
     """
     The date_parse transform takes no compile time args
     """
-    raise WhitelistCompileException
+    raise WhitelistCompileException(compile_time_error(*args))
 
 
 def get_transform_function(*compile_args):

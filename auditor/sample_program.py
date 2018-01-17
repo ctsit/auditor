@@ -11,15 +11,16 @@ quotechar "
 
 col "one bird"
 | date_parse
-| return
+| done
 
 col two
 | date_parse
 | date_parse
-| return
+| done
 
 col test
-| return
+| lookup test_lookup.json two
+| done
 
 col other
-| return
+| done
