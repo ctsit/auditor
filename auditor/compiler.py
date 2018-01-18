@@ -101,6 +101,11 @@ class AuditorCompiler(object):
                 elif operation in ['column_order']:
                     check = self.__get_has_num_args(greater_equal=1)
                     check(*args)
+                elif operation in ['col']:
+                    check = self.__get_has_num_args(greater_equal=1)
+                    check(*args)
+                    check = self.__get_has_num_args(less_equal=2)
+                    check(*args)
                 elif operation == '|':
                     check = self.__get_has_num_args(greater_equal=1)
                     check(*args)

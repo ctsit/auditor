@@ -4,9 +4,16 @@ from auditor.base_exceptions import RuntimeException
 class Column(object):
     def __init__(self, instructions):
         self.name = instructions[0].get('args')[0]
+        try:
+            self.priority = int(instructions[0].get('args')[1])
+        except:
+            self.priority = 999
         self.transforms = []
         for instruction in instructions[1:]:
             self.__set_transform(instruction)
+
+    def __repr__(self):
+        return '<name:{name};priority:{priority}>'.format(name=self.name, priority=self.priority)
 
     def __set_transform(self, instruction):
         if instruction.get('op') == '|':

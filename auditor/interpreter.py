@@ -34,12 +34,12 @@ class Interpreter(object):
         else:
             transform_by_col = [transforms[indices[i]:indices[i+1]] for i in range(len(indices) - 1)]
 
-        columns = {}
+        columns = []
         for instructions in transform_by_col:
             col_op = instructions[0]
             trans_ops = instructions[1:]
             col_name = col_op.get('args')[0]
-            columns.setdefault(col_name, Column(instructions))
+            columns.append(Column(instructions))
         return columns
 
     def get_args_for_op(self, operation, expected=1, one_result=False, optional=False):
@@ -96,25 +96,40 @@ class Interpreter(object):
 
         # build up transforms for each column
         columns = self.get_column_transforms()
+        columns.sort(key=lambda col: col.priority)
+        for col in columns:
+            print(col)
 
         # for each row
         for row in reader:
             new_row = {}
+            print(row)
             for key, val in rename_lookup.items():
-                row[val] = row[key]
+                row[val] = copy(row[key])
                 del row[key]
-            for key in headers:
+            print(row)
+
+            current_priority = None
+            for col in columns:
                 # pass row through transforms
+                if current_priority == None:
+                    current_priority = col.priority
+                elif current_priority < col.priority:
+                    current_priority = col.priority
+                    row.update(new_row)
                 try:
-                    new_row.setdefault(key, columns[key](row))
+                    new_row.setdefault(key, col(row))
                 except KeyError:
                     raise RuntimeException('No column transform found for {}'.format(key))
                 # write row to file
+
             try:
-                writer.writerow(new_row)
-            except:
+                writer.writerow(row)
+            except Exception as ex:
+                print(new_row)
                 print('Failed to write: {}'.format(new_row))
                 print('Initial row: {}'.format(row))
+                raise ex
 
         # end
         infile.close()

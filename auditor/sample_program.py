@@ -9,13 +9,13 @@ column_rename one "one bird"
 separator ,
 quotechar "
 
-col "one bird"
+col "one bird" 1
 | date_parse
 | done
 
 col two
 | date_parse
-| date_parse
+| greater_equal "one bird"
 | done
 
 col test
