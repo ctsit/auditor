@@ -96,7 +96,7 @@ class Interpreter(object):
 
         # build up transforms for each column
         columns = self.get_column_transforms()
-        columns.sort(key=lambda col: col.priority)
+        columns.sort(key=lambda col: -1 * col.priority)
         for col in columns:
             print(col)
 
@@ -114,7 +114,7 @@ class Interpreter(object):
                 # pass row through transforms
                 if current_priority == None:
                     current_priority = col.priority
-                elif current_priority < col.priority:
+                elif current_priority > col.priority:
                     current_priority = col.priority
                     row.update(new_row)
                 try:

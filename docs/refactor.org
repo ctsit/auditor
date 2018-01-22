@@ -56,7 +56,9 @@ row_sort <column_name> ...
 # ... are the args that will be curried to the particular function
 # the final arg will always be the whole original row and the
 # return value will be assigned to the column specified initially
-col <column_name>
+# column priority works by transforming columns with a higher numerical
+# priority value first
+col <column_name> <column_priority>
 | lookup ... 
 | dateparse  
 | return 

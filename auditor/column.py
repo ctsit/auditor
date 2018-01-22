@@ -7,7 +7,7 @@ class Column(object):
         try:
             self.priority = int(instructions[0].get('args')[1])
         except:
-            self.priority = 999
+            self.priority = -999999999
         self.transforms = []
         for instruction in instructions[1:]:
             self.__set_transform(instruction)

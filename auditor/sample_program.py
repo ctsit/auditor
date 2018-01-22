@@ -9,7 +9,7 @@ column_rename one "one bird"
 separator ,
 quotechar "
 
-col "one bird" 1
+col "one bird" 10
 | date_parse
 | done
 
