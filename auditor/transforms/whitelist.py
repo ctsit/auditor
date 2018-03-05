@@ -50,7 +50,7 @@ def check_args(*args):
     except:
         raise WhitelistCompileException(compile_time_error(*args))
     if not os.path.isfile(whitelist_file_path):
-        WhitelistCompileException("""
+        raise WhitelistCompileException("""
         Please pass a valid path to a json or yaml list or a newline delimited
         list of strings.
         path passed: {}

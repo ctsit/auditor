@@ -1,5 +1,3 @@
-#!/usr/local/bin/auditor
-
 read test.csv
 write test2.csv
 

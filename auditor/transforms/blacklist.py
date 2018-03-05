@@ -50,7 +50,7 @@ def check_args(*args):
     except:
         raise BlacklistCompileException(compile_time_error(*args))
     if not os.path.isfile(blacklist_file_path):
-        BlacklistCompileException("""
+        raise BlacklistCompileException("""
         Please pass a valid path to a json or yaml list or a newline delimited
         list of strings.
         path passed: {}

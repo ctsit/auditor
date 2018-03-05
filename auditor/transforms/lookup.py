@@ -36,7 +36,7 @@ def check_args(*args):
     except:
         raise LookupCompileException(compile_time_error(*args))
     if not os.path.isfile(lookup_file_path):
-        LookupCompileException("""
+        raise LookupCompileException("""
         Please pass a valid path to a json or yaml dictionary
         path passed: {}
         current working directory: {}

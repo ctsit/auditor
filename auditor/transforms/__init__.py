@@ -6,4 +6,3 @@ from .blacklist import *
 from .greater_equal import *
 from .done import *
 from .greater_than import *
-from .regex import *
