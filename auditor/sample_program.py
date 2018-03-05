@@ -20,7 +20,10 @@ col two
 
 col test
 | lookup test_lookup.json two
+| blacklist test_blacklist.newline
 | done
 
 col other
+| lookup test_lookup.json "one bird"
+| whitelist test_whitelist.newline
 | done

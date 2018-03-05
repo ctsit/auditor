@@ -41,6 +41,25 @@ def check_args(*args):
         path passed: {}
         current working directory: {}
         """.format(lookup_file_path, os.getcwd()))
+    try:
+        with open(lookup_file_path, 'r') as infile:
+            data = yaml.load(infile)
+    except:
+        raise LookupCompileException("""
+        The file passed to the lookup is not parseable as yaml or json.
+        Make sure you are referencing a properly formatted yaml or json file
+        with a dictionary of the lookup key and corresponding value.
+
+        path passed: {}
+        current working directory: {}
+        """.format(lookup_file_path, os.getcwd()))
+    if not type(data) == type({}):
+        raise LookupCompileException("""
+        The file passed was parsed but was not a dictionary.
+        Make sure the file contents are properly formatted as yaml or json.
+        path passed: {}
+        current working directory: {}
+        """.format(lookup_file_path, os.getcwd()))
 
 
 def get_transform_function(*compile_args):
