@@ -1,6 +1,7 @@
 import os
 import importlib
 from auditor.base_exceptions import CompileException
+from itertools import chain
 
 class AuditorCompiler(object):
     version = '1'
@@ -34,6 +35,8 @@ class AuditorCompiler(object):
         operations = []
         current_operation = None
         for index, line in enumerate(lines):
+            if len(line) and line[0] == '#':
+                continue
 
             if '"' in line and not 'quotechar' in line:
                 items = line.split('"')
@@ -114,7 +117,6 @@ class AuditorCompiler(object):
                     except:
                         raise CompileException('No such transform module for function {}'.format(args[0]))
                     transform.check_args(*args)
-
             except Exception as ex:
                 print('CompileException on line {}'.format(line_num))
                 raise ex

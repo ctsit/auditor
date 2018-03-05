@@ -1,7 +1,7 @@
 import importlib
 from auditor.base_exceptions import RuntimeException
 
-class Column(object):
+class ColumnMapper(object):
     def __init__(self, instructions):
         self.name = instructions[0].get('args')[0]
         try:
@@ -19,11 +19,10 @@ class Column(object):
         if instruction.get('op') == '|':
             func = instruction.get('args')[0]
             args = instruction.get('args')
-            if not func == 'return':
-                transform = importlib.import_module('auditor.transforms.{}'.format(args[0]))
-                self.transforms.append(transform.get_transform_function(*args))
-            else:
-                self.transforms.append(lambda value, name, row: value)
+            transform = importlib.import_module('auditor.transforms.{}'.format(args[0]))
+            transform_func = transform.get_transform_function(*args)
+            transform_func.name = args[0]
+            self.transforms.append(transform_func)
         else:
             raise RuntimeException('incorrect instruction sent to column {}'.format(instruction))
 

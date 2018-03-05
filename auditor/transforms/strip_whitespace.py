@@ -17,7 +17,7 @@ def compile_time_error(*args, **kwargs):
     """
     return """
     strip_whitespace compile error.
-    strip_whitespace takes no args.
+    strip_whitespace takes no additional args
 
     passed: {}
     """.format(*args, **kwargs)
@@ -26,7 +26,7 @@ def check_args(*args):
     """
     The date_parse transform takes no compile time args
     """
-    if len(args):
+    if len(args) != 1 or args[0] != 'strip_whitespace':
         raise StripWhitespaceCompileException(compile_time_error(*args))
 
 

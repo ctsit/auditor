@@ -1,5 +1,6 @@
 from auditor.base_exceptions import RuntimeException
-from auditor.column import Column
+from auditor.column_mapper import ColumnMapper
+from auditor.row_mapper import RowMapper
 import csv
 from copy import copy
 
@@ -39,7 +40,8 @@ class Interpreter(object):
             col_op = instructions[0]
             trans_ops = instructions[1:]
             col_name = col_op.get('args')[0]
-            columns.append(Column(instructions))
+            columns.append(ColumnMapper(instructions))
+        columns.sort(key=lambda col: -1 * col.priority)
         return columns
 
     def get_args_for_op(self, operation, expected=1, one_result=False, optional=False):
@@ -58,8 +60,7 @@ class Interpreter(object):
         else:
             return ins_args
 
-    def __call__(self):
-        # build up how to read file
+    def get_infile_outfile_options(self):
         inpath = self.get_args_for_op('read', one_result=True)
         outpath = self.get_args_for_op('write', one_result=True)
         encoding = self.get_args_for_op('encoding', one_result=True, optional=True)
@@ -70,67 +71,51 @@ class Interpreter(object):
         outfile = open(outpath, 'w', encoding=encoding)
 
         # create reader for csv
-        reader_opts = {
+        options = {
             'quotechar': quotechar[0] if len(quotechar) else None,
             'delimiter': separator[0] if len(separator) else None,
         }
-        reader = csv.DictReader(infile, **reader_opts)
+        return infile, outfile, options
 
-        # create writer for csv
-        headers = copy(reader.fieldnames)
+    def get_outfile_header_information(self, reader):
+        fieldnames = copy(reader.fieldnames)
         new_cols = self.get_args_for_op('column_add', one_result=True, expected=-1, optional=True)
         if new_cols:
-            headers += new_cols
+            fieldnames += new_cols
         renames = self.get_args_for_op('column_rename', optional=True)
         rename_lookup = {}
         for old, new in renames:
             rename_lookup[old] = new
-            headers[headers.index(old)] = new
+            fieldnames[fieldnames.index(old)] = new
         column_order = self.get_args_for_op('column_order', expected=-1, one_result=True)
-        headers = sorted(headers, key=lambda col: column_order.index(col))
+        fieldnames = sorted(fieldnames, key=lambda col: column_order.index(col))
+        return fieldnames, rename_lookup
 
-
-        writer = csv.DictWriter(outfile, fieldnames=headers, **reader_opts)
+    def __call__(self):
+        infile, outfile, options = self.get_infile_outfile_options()
+        reader = csv.DictReader(infile, **options)
+        fieldnames, row_rename_mapping = self.get_outfile_header_information(reader)
+        writer = csv.DictWriter(outfile, fieldnames=fieldnames, **options)
         # write header
         writer.writeheader()
 
         # build up transforms for each column
         columns = self.get_column_transforms()
-        columns.sort(key=lambda col: -1 * col.priority)
-        for col in columns:
-            print(col)
 
         # for each row
         for row in reader:
-            new_row = {}
-            print(row)
-            for key, val in rename_lookup.items():
-                row[val] = copy(row[key])
-                del row[key]
-            print(row)
-
-            current_priority = None
-            for col in columns:
-                # pass row through transforms
-                if current_priority == None:
-                    current_priority = col.priority
-                elif current_priority > col.priority:
-                    current_priority = col.priority
-                    row.update(new_row)
-                try:
-                    new_row.setdefault(key, col(row))
-                except KeyError:
-                    raise RuntimeException('No column transform found for {}'.format(key))
-                # write row to file
+            mapper = RowMapper(row, row_rename_mapping, columns, fieldnames)
+            for priority in mapper.get_priorities():
+                mapper.update(priority)
 
             try:
-                writer.writerow(row)
+                # check for bad data
+                # writer.writerow(row)
+                writer.writerow(mapper.data)
             except Exception as ex:
-                print(new_row)
-                print('Failed to write: {}'.format(new_row))
-                print('Initial row: {}'.format(row))
+                print('Failed to write: {}'.format(mapper.data))
+                print('Initial row: {}'.format(mapper._original_data))
                 raise ex
 
-        # end
         infile.close()
         outfile.close()

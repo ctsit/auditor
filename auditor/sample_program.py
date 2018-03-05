@@ -1,29 +1,33 @@
+#!/usr/local/bin/auditor
+
 read test.csv
 write test2.csv
 
-column_add other test
-column_order two "one bird" other test
+column_add test bird_name
+column_order two one color bird_name test
 column_rename "two birds" two
-column_rename one "one bird"
 
 separator ,
 quotechar "
 
-col "one bird" 10
+col color 7
+| strip_whitespace
+| done
+
+col one 10
 | date_parse
 | done
 
-col two
-| date_parse
-| greater_equal "one bird"
-| done
-
-col test
+col test 5
 | lookup test_lookup.json two
 | blacklist test_blacklist.newline
 | done
 
-col other
-| lookup test_lookup.json "one bird"
-| whitelist test_whitelist.newline
+col bird_name 5
+| lookup color_lookup.yaml color
+| done
+
+col two -5
+| date_parse
+| greater_than one
 | done
