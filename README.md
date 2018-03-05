@@ -30,8 +30,8 @@ fields, follow the following steps:
   * fork this repo
   * clone this repository
   * install the dev-requirements with `pip3 install -r dev-requirements.txt`
-  * 'cd <repo-clone-directory>/auditor'
-  * run `python3 /dev_scripts/make_new_col_transform.py <transforms-you-need>...`
+  * 'cd <repo-clone-directory>/auditor/transforms'
+  * run `python3 ../dev_scripts/make_new_col_transform.py <transforms-you-need>...`
   * edit the code till it works. Testing against a program and data file in the examples directory
   * submit a pull request
 

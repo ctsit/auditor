@@ -32,6 +32,5 @@ col bird_name 5
 col two -5
 | date_parse
 # we want a comment syntax
-| greater_equal one
-# | greater_than one
+| operator gt one
 | done
