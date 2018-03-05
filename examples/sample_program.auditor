@@ -2,8 +2,9 @@ read test.csv
 write test2.csv
 
 column_add test bird_name
-column_order two one color bird_name test
+column_order two one color bird_name test not_listed_here
 column_rename "two birds" two
+# remove_bad_data
 
 separator ,
 quotechar "
@@ -16,9 +17,12 @@ col one 10
 | date_parse
 | done
 
+col one -78
+| blacklist test_blacklist.newline
+| done
+
 col test 5
 | lookup test_lookup.json two
-| blacklist test_blacklist.newline
 | done
 
 col bird_name 5
@@ -27,5 +31,7 @@ col bird_name 5
 
 col two -5
 | date_parse
-| greater_than one
+# we want a comment syntax
+| greater_equal one
+# | greater_than one
 | done

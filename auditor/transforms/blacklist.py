@@ -4,7 +4,7 @@ import yaml
 
 def transform_body(value, name, row, blacklist_data):
     # write the transform here
-    return value if value in blacklist_data else '<BAD_DATA>'
+    return '<BAD_DATA>' if value in blacklist_data else value
 
 class BlacklistCompileException(CompileException):
     pass

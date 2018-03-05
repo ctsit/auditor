@@ -7,6 +7,7 @@ class AuditorCompiler(object):
     version = '1'
     operator_tokens = [
         'read',
+        'remove_bad_data',
         'encoding',
         'separator',
         'quotechar',
@@ -92,6 +93,9 @@ class AuditorCompiler(object):
             try:
                 if operation == 'read':
                     self.__check_file(*args)
+                elif operation == "remove_bad_data":
+                    check = self.__get_has_num_args(num=0)
+                    check(*args)
                 elif operation in ['encoding', 'separator', 'quotechar', 'write']:
                     check = self.__get_has_num_args(num=1)
                     check(*args)

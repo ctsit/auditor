@@ -44,11 +44,13 @@ class Interpreter(object):
         columns.sort(key=lambda col: -1 * col.priority)
         return columns
 
-    def get_args_for_op(self, operation, expected=1, one_result=False, optional=False):
+    def get_args_for_op(self, operation, expected=1, one_result=False, optional=False, flag=False):
         instructions = self.get_instructions(operation)
         ins_args = [item.get('args') for item in instructions]
         if optional and len(ins_args) == 0:
             return None
+        if flag:
+            return True if len(instructions) else False
         if one_result:
             if not len(ins_args) == 1:
                 raise RuntimeException('Too many instances of instruction: {}'.format(instructions))
@@ -70,7 +72,6 @@ class Interpreter(object):
         infile = open(inpath, 'r', encoding=encoding)
         outfile = open(outpath, 'w', encoding=encoding)
 
-        # create reader for csv
         options = {
             'quotechar': quotechar[0] if len(quotechar) else None,
             'delimiter': separator[0] if len(separator) else None,
@@ -96,22 +97,21 @@ class Interpreter(object):
         reader = csv.DictReader(infile, **options)
         fieldnames, row_rename_mapping = self.get_outfile_header_information(reader)
         writer = csv.DictWriter(outfile, fieldnames=fieldnames, **options)
-        # write header
         writer.writeheader()
-
-        # build up transforms for each column
         columns = self.get_column_transforms()
+        remove_bad_data = self.get_args_for_op('remove_bad_data', flag=True)
 
-        # for each row
         for row in reader:
             mapper = RowMapper(row, row_rename_mapping, columns, fieldnames)
             for priority in mapper.get_priorities():
                 mapper.update(priority)
 
             try:
-                # check for bad data
-                # writer.writerow(row)
-                writer.writerow(mapper.data)
+                if not remove_bad_data:
+                    writer.writerow(mapper.data)
+                else:
+                    if not mapper.has_bad_data():
+                        writer.writerow(mapper.data)
             except Exception as ex:
                 print('Failed to write: {}'.format(mapper.data))
                 print('Initial row: {}'.format(mapper._original_data))

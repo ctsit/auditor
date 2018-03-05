@@ -1,7 +1,7 @@
-two,one,color,bird_name,test
-1993-01-11,1991-01-11,red,ruby throated hummingbird,<BAD_DATA>
-1994-01-11,1991-02-11,green,parrot,<BAD_DATA>
-<BAD_DATA>,1993-09-11,blue,macaw,<BAD_DATA>
-<BAD_DATA>,1994-09-11,red,ruby throated hummingbird,<BAD_DATA>
-1993-09-11,1993-03-11,green,parrot,<BAD_DATA>
-<BAD_DATA>,1994-09-11,black,crow,<BAD_DATA>
+two,one,color,bird_name,test,not_listed_here
+1993-01-11,1991-01-11,red,ruby throated hummingbird,ninteen ninety three,a column
+1994-01-11,1991-02-11,green,parrot,ninteen ninety four,can not have
+1993-09-11,<BAD_DATA>,blue,macaw,,a col block
+1994-09-11,<BAD_DATA>,red,ruby throated hummingbird,,in the program
+1993-09-11,1993-03-11,green,parrot,,but still
+1994-09-11,<BAD_DATA>,black,crow,,pass through
