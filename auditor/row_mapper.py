@@ -23,6 +23,12 @@ class RowMapper(object):
     def get_output_keys(self):
         return self.target_fieldnames
 
+    def get_output_data(self):
+        retval = {}
+        for key in self.get_output_keys():
+            retval[key] = self.data[key]
+        return retval
+
     def update(self, priority):
         matching_cols = [col for col in self.cols if col.priority == priority]
         data_copy = copy(self.data)

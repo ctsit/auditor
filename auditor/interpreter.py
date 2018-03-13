@@ -84,11 +84,16 @@ class Interpreter(object):
         if new_cols:
             fieldnames += new_cols
         renames = self.get_args_for_op('column_rename', optional=True)
+        if type(renames) == type(None):
+            renames = []
         rename_lookup = {}
         for old, new in renames:
             rename_lookup[old] = new
             fieldnames[fieldnames.index(old)] = new
         column_order = self.get_args_for_op('column_order', expected=-1, one_result=True)
+        for col in fieldnames:
+            if not col in column_order:
+                fieldnames.remove(col)
         fieldnames = sorted(fieldnames, key=lambda col: column_order.index(col))
         return fieldnames, rename_lookup
 
@@ -108,10 +113,10 @@ class Interpreter(object):
 
             try:
                 if not remove_bad_data:
-                    writer.writerow(mapper.data)
+                    writer.writerow(mapper.get_output_data())
                 else:
                     if not mapper.has_bad_data():
-                        writer.writerow(mapper.data)
+                        writer.writerow(mapper.get_output_data())
             except Exception as ex:
                 print('Failed to write: {}'.format(mapper.data))
                 print('Initial row: {}'.format(mapper._original_data))

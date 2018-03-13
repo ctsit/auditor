@@ -3,7 +3,7 @@ import dateutil.parser as date_parser
 
 def transform_body(value, name, row):
     # write the transform here
-    return date_parser.parse(value).strftime('%Y-%m-%d')
+    return date_parser.parse(value).strftime('%Y-%m-%d') if value else ''
 
 class DateParseCompileException(CompileException):
     pass

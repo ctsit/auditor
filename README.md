@@ -38,3 +38,39 @@ fields, follow the following steps:
 ## Examples
 
 Look in the examples folder for a sample program of all features that are currently implemented.
+
+## Language specification
+
+There are two parts to the auditor D.S.L. The preamble, which describes the two csv files, their paths,
+how they are structured and whether to remove bad data, and the `col` blocks which describe how to transform
+a given row column pair in a csv.
+
+In the D.S.L. you can specify a string with spaces by surrounding it with `"` characters.
+
+### Preamble
+
+| keyword           | meaning / function                                             |      # args | arg types                                       |
+|-------------------|----------------------------------------------------------------|-------------|-------------------------------------------------|
+| `read`            | specifies the input file                                       |           1 | relative file path from where the script is run |
+| `write`           | specifies the output file                                      |           1 | relative file path from where the script is run |
+| `separator`       | the character that separates columns in the input file         |           1 | single unescaped character                      |
+| `quotechar`       | the character that quotes a cell in the input file             |           1 | single unescaped character                      |
+| `encoding`        | the encoding of the input file                                 |           1 | an encoding string python3 understands          |
+| `column_add`      | adds any columns to the output                                 | more than 0 | space separated list of column names to add     |
+| `column_order`    | the output order of the columns                                | num of cols | space separated list of column names in order   |
+| `column_rename`   | rename column from first arg to second                         |           2 | space separated list of old column name and new |
+| `remove_bad_data` | flag to remove rows from the output with a `<BAD_DATA>` string |           0 | this arg is a flag and takes no args            |
+
+Note that columns not listed in the column order will not be put into the output file.
+
+### col blocks
+
+These describe the sequence of transforms to take place in a run of auditor. Each block should have:
+  * A newline before and after
+  * A start line of `col <column_name> <optional_priority>`
+  * An ending line of `| done`
+  
+The column name in the first line should be the name after renaming. The priority denotes which blocks get executed first.
+Since a column has access to the rest of the row, there are times you want to do something before something else.
+Higher priority col blocks get executed first. If two col blocks have the same priority, there is no defined behavior for
+which goes first.
