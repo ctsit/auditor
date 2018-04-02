@@ -1,0 +1,36 @@
+read test.csv
+write test2.csv
+
+column_add test bird_name
+column_order two one color bird_name test not_listed_here
+column_rename "two birds" two
+# remove_bad_data
+
+separator ,
+quotechar "
+
+col color 7
+| strip_whitespace
+| done
+
+col one 10
+| date_parse
+| done
+
+col one -78
+| blacklist test_blacklist.newline
+| done
+
+col test 5
+| lookup test_lookup.json two
+| done
+
+col bird_name 5
+| lookup color_lookup.yaml color
+| done
+
+col two -5
+| date_parse
+# we want a comment syntax
+| operator gt one
+| done
