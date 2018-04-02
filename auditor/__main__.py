@@ -11,6 +11,7 @@ Options:
 Auditor is used to run auditor program files to alter csv files
 """
 from docopt import docopt
+from auditor.version import __version__
 
 from auditor.compiler import AuditorCompiler
 from auditor.interpreter import Interpreter
@@ -28,7 +29,10 @@ def main(args=docopt(docstr)):
         parser.write(args.get('<new_program>'))
 
 
-if __name__ == '__main__':
-    args = docopt(docstr)
+def cli_run():
+    args = docopt(docstr, version=__version__)
     main(args)
+
+if __name__ == '__main__':
+    cli_run()
     exit()
