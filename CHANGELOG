@@ -1,4 +1,10 @@
-## [1.3.0] 10-24-2017
+# Changelog
+
+## [2.0.0] 2018-10-16
+### Changed
+ * Moved from YAML config files to a domain-specifc language. (Patrick White)
+
+## [1.3.0] 2017-10-24
 ### Added
  * add docopt support (Matthew McConnell)
  * clean up version and dev-reqs files (Matthew McConnell)
@@ -6,14 +12,14 @@
  * create a version file (Matthew McConnell)
  * specify the specific version of requirements (Matthew McConnell)
 
-## [1.2.0] 8-28-2017
+## [1.2.0] 2017-08-28
 ### Added
-* add strip_whitespace mapping (Patrick White)
+ * add strip_whitespace mapping (Patrick White)
 
 ### Fixed
-* fix regex default matching (Patrick White)
+ * fix regex default matching (Patrick White)
 
-## [1.1.0] 8-13-2017
+## [1.1.0] 2017-08-13
 ### Added
  * add regex example (Patrick White)
  * add deidentify example (Patrick White)
@@ -22,7 +28,7 @@
 ### Fixed
  * bugfix for blank lines, empty config keys (Patrick White)
 
-## [1.0.0]
+## [1.0.0] 2017-04-27
  * updates setup.py to be 1.0.0 (Patrick White)
  * let users use different encodings, and add quotechars on the way out (Patrick White)
  * allows config to not define new headers (Patrick White)

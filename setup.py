@@ -6,9 +6,11 @@ with open('auditor/version.py') as ver:
 setup(name='auditor',
       version=__version__,
       description='Makes sure your CSV data is complian.',
-      url='http://github.com/pfwhite/auditor',
+      url='http://github.com/ctsit/auditor',
       author='Patrick White',
       author_email='pfwhite9@gmail.com',
+      maintainer='CTS-IT at the University of Florida',
+      maintainer_email='ctsit@ctsi.ufl.edu',
       license='Apache2.0',
       packages=['auditor'],
       entry_points={
